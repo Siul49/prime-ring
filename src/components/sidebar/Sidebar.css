@@ -1,0 +1,202 @@
+.sidebar {
+    width: 220px;
+    padding: var(--space-6);
+    flex-shrink: 0;
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--glass-shadow);
+}
+
+/* 미니 캘린더 */
+.mini-calendar {
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mini-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.mini-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.mini-nav {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.mini-nav:hover {
+    background: var(--primary-dim);
+    color: var(--primary);
+}
+
+.mini-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: var(--space-1);
+}
+
+.mini-weekday {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-1);
+}
+
+.mini-weekday.sunday {
+    color: #f87171;
+}
+
+.mini-weekday.saturday {
+    color: var(--primary);
+}
+
+.mini-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.mini-day {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 5px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mini-day:hover {
+    background: var(--primary-dim);
+    color: var(--text-primary);
+}
+
+.mini-day-today {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.mini-day-today:hover {
+    background: var(--primary-light);
+}
+
+/* 섹션 */
+.sidebar-section {
+    margin-bottom: var(--space-6);
+}
+
+.sidebar-title {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-2);
+    padding-left: var(--space-2);
+}
+
+/* 카테고리 */
+.category-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.category-item:hover {
+    background: var(--glass-bg-hover);
+}
+
+.category-item-active {
+    background: var(--glass-bg-active);
+    border-color: var(--glass-border-active);
+}
+
+.category-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 6px currentColor;
+}
+
+.category-icon {
+    font-size: 0.95rem;
+}
+
+.category-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* 태그 */
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.tag {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    padding: var(--space-1) var(--space-3);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.tag:hover {
+    background: var(--primary-dim);
+    border-color: var(--glass-border-active);
+    color: var(--primary);
+}
+
+@media (max-width: 1100px) {
+    .sidebar {
+        width: 100%;
+        order: 2;
+        max-height: 200px;
+    }
+
+    .mini-calendar {
+        display: none;
+    }
+}
