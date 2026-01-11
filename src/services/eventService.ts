@@ -19,31 +19,47 @@ const parseEventDates = (event: any): Event => ({
 export const EventService = {
     // 모든 이벤트 가져오기
     getEvents: async (): Promise<Event[]> => {
-        if (!window.electron) {
-            console.warn('Electron API not found. Running in browser mode with empty data.')
-            return []
+        // Electron 모드: 파일 시스템 사용
+        if (window.electron) {
+            const { success, data, error } = await window.electron.loadData(FILE_NAME)
+            if (!success) throw new Error(error)
+            if (!data) return []
+
+            try {
+                const parsed = JSON.parse(data)
+                return parsed.map(parseEventDates)
+            } catch (e) {
+                console.error('Failed to parse events:', e)
+                return []
+            }
         }
-        const { success, data, error } = await window.electron.loadData(FILE_NAME)
-        if (!success) throw new Error(error)
+
+        // 브라우저 모드: localStorage 사용
+        const data = localStorage.getItem(FILE_NAME)
         if (!data) return []
 
         try {
             const parsed = JSON.parse(data)
             return parsed.map(parseEventDates)
         } catch (e) {
-            console.error('Failed to parse events:', e)
+            console.error('Failed to parse events from localStorage:', e)
             return []
         }
     },
 
     // 이벤트 저장 (전체 덮어쓰기 방식)
     saveEvents: async (events: Event[]) => {
-        if (!window.electron) {
-            console.error('Cannot save events: Electron API missing')
+        const jsonData = JSON.stringify(events, null, 2)
+
+        // Electron 모드: 파일 시스템 사용
+        if (window.electron) {
+            const { success, error } = await window.electron.saveData(FILE_NAME, jsonData)
+            if (!success) throw new Error(error)
             return
         }
-        const { success, error } = await window.electron.saveData(FILE_NAME, JSON.stringify(events, null, 2))
-        if (!success) throw new Error(error)
+
+        // 브라우저 모드: localStorage 사용
+        localStorage.setItem(FILE_NAME, jsonData)
     },
 
     addEvent: async (eventData: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {

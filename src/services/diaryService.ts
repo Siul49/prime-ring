@@ -11,24 +11,46 @@ const parseDiaryDates = (diary: any): Diary => ({
 
 export const DiaryService = {
     getDiaries: async (): Promise<Diary[]> => {
-        if (!window.electron) return []
-        const { success, data, error } = await window.electron.loadData(FILE_NAME)
-        if (!success) throw new Error(error)
+        // Electron 모드: 파일 시스템 사용
+        if (window.electron) {
+            const { success, data, error } = await window.electron.loadData(FILE_NAME)
+            if (!success) throw new Error(error)
+            if (!data) return []
+
+            try {
+                const parsed = JSON.parse(data)
+                return parsed.map(parseDiaryDates)
+            } catch (e) {
+                console.error('Failed to parse diaries:', e)
+                return []
+            }
+        }
+
+        // 브라우저 모드: localStorage 사용
+        const data = localStorage.getItem(FILE_NAME)
         if (!data) return []
 
         try {
             const parsed = JSON.parse(data)
             return parsed.map(parseDiaryDates)
         } catch (e) {
-            console.error('Failed to parse diaries:', e)
+            console.error('Failed to parse diaries from localStorage:', e)
             return []
         }
     },
 
     saveDiaries: async (diaries: Diary[]) => {
-        if (!window.electron) return
-        const { success, error } = await window.electron.saveData(FILE_NAME, JSON.stringify(diaries, null, 2))
-        if (!success) throw new Error(error)
+        const jsonData = JSON.stringify(diaries, null, 2)
+
+        // Electron 모드: 파일 시스템 사용
+        if (window.electron) {
+            const { success, error } = await window.electron.saveData(FILE_NAME, jsonData)
+            if (!success) throw new Error(error)
+            return
+        }
+
+        // 브라우저 모드: localStorage 사용
+        localStorage.setItem(FILE_NAME, jsonData)
     },
 
     addDiary: async (diaryData: Omit<Diary, 'id' | 'createdAt' | 'updatedAt'>) => {

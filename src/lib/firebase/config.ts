@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { initializeApp, type FirebaseApp } from 'firebase/app'
+import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getAuth, type Auth } from 'firebase/auth'
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,13 +11,23 @@ const firebaseConfig = {
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-// 환경변수가 없으면 경고
-if (!firebaseConfig.apiKey) {
-    console.warn('⚠️ Firebase config missing. Create .env.local with VITE_FIREBASE_* variables.')
+// Firebase 초기화 (옵셔널)
+let app: FirebaseApp | null = null
+let db: Firestore | null = null
+let auth: Auth | null = null
+
+if (firebaseConfig.apiKey) {
+    try {
+        app = initializeApp(firebaseConfig)
+        db = getFirestore(app)
+        auth = getAuth(app)
+        console.log('🔥 Firebase initialized:', firebaseConfig.projectId)
+    } catch (error) {
+        console.warn('⚠️ Firebase initialization failed:', error)
+    }
+} else {
+    console.info('ℹ️ Firebase not configured. Using local storage only.')
+    console.info('   To enable Firebase sync, create .env.local with VITE_FIREBASE_* variables.')
 }
 
-export const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
-export const auth = getAuth(app)
-
-console.log('🔥 Firebase initialized:', firebaseConfig.projectId)
+export { app, db, auth }
