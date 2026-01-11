@@ -18,11 +18,12 @@ AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데�
 ## ✨ 주요 기능
 
 - 📅 **스마트 캘린더**: 월간 뷰로 이벤트를 쉽게 관리
-- 📝 **AI 다이어리**: Gemini API를 활용한 자동 감정 분석
+- 📝 **AI 다이어리**: 로컬 LLM(Llama-3.2-3B)을 활용한 자동 감정 분석 및 요약
 - 🏷️ **카테고리 관리**: 커스텀 카테고리 생성 및 색상 설정
 - 🌓 **테마 전환**: 라이트/다크 모드 지원
 - ☁️ **실시간 동기화**: Firebase Firestore 기반 데이터 저장
 - 🖥️ **크로스 플랫폼**: Electron 기반 Windows/macOS/Linux 지원
+- 🔒 **프라이버시 우선**: AI 분석이 브라우저 내에서 로컬로 실행되어 데이터가 외부로 전송되지 않음
 
 ## 🔧 기술 스택
 
@@ -31,7 +32,7 @@ AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데�
 - **상태 관리**: Zustand
 - **UI 라이브러리**: Framer Motion, React Hot Toast
 - **데이터베이스**: Firebase Firestore
-- **AI**: Google Gemini API
+- **AI**: MLC WebLLM (Llama-3.2-3B-Instruct, 로컬 실행)
 - **데스크톱**: Electron
 - **스타일링**: CSS Modules
 
