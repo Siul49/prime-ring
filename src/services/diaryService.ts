@@ -49,8 +49,41 @@ export const DiaryService = {
             return
         }
 
-        // 브라우저 모드: localStorage 사용
-        localStorage.setItem(FILE_NAME, jsonData)
+        // 브라우저 모드: localStorage 사용 (보안 강화)
+        try {
+            // 🔒 보안: 데이터 크기 제한 (5MB, 대부분의 브라우저에서 안전)
+            const MAX_STORAGE_SIZE = 5 * 1024 * 1024 // 5MB
+            const dataSize = new Blob([jsonData]).size
+
+            if (dataSize > MAX_STORAGE_SIZE) {
+                const sizeMB = (dataSize / 1024 / 1024).toFixed(2)
+                throw new Error(
+                    `데이터가 너무 큽니다 (${sizeMB}MB). ` +
+                    `오래된 다이어리를 삭제하거나 데스크톱 앱을 사용하세요.`
+                )
+            }
+
+            // 저장 시도
+            localStorage.setItem(FILE_NAME, jsonData)
+
+            // 성공 시 저장 용량 로깅 (개발 모드)
+            if (import.meta.env.DEV) {
+                const sizeKB = (dataSize / 1024).toFixed(2)
+                console.log(`✅ Diaries saved to localStorage: ${sizeKB}KB / ${MAX_STORAGE_SIZE / 1024 / 1024}MB`)
+            }
+        } catch (error: any) {
+            // QuotaExceededError 처리
+            if (error.name === 'QuotaExceededError') {
+                throw new Error(
+                    '저장 공간이 부족합니다. ' +
+                    '브라우저 저장소가 가득 찼습니다. ' +
+                    '오래된 다이어리를 삭제하거나 Electron 데스크톱 앱을 사용하세요.'
+                )
+            }
+
+            // 기타 에러
+            throw new Error(`다이어리 저장 실패: ${error.message}`)
+        }
     },
 
     addDiary: async (diaryData: Omit<Diary, 'id' | 'createdAt' | 'updatedAt'>) => {
