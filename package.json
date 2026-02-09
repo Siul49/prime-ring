@@ -9,6 +9,7 @@
     "dev:electron": "cross-env NODE_ENV=development tsc -p tsconfig.electron.json && wait-on tcp:5173 && electron .",
     "build": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types src/lib/utils.test.ts",
     "preview": "vite preview"
   },
   "main": "dist-electron/main.js",
