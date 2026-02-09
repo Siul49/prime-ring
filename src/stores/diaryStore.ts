@@ -34,9 +34,9 @@ export const useDiaryStore = create<DiaryState>((set, get) => ({
 
     addDiary: async (diaryData) => {
         try {
-            await DiaryService.addDiary(diaryData)
+            const newDiary = await DiaryService.addDiary(diaryData)
             toast.success('일기가 저장되었습니다 📖')
-            get().loadDiaries()
+            set((state) => ({ diaries: [...state.diaries, newDiary] }))
         } catch (error) {
             console.error('❌ Error adding diary:', error)
             toast.error('일기 저장 실패')
