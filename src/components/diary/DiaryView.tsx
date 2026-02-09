@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDiaryStore } from '../../stores/diaryStore'
 import { DiaryModal } from './DiaryModal'
 import { formatDate } from '../../lib/utils'
@@ -31,7 +31,9 @@ export function DiaryView() {
         }
     }
 
-    const sortedDiaries = [...diaries].sort((a, b) => b.date.getTime() - a.date.getTime())
+    const sortedDiaries = useMemo(() => {
+        return [...diaries].sort((a, b) => b.date.getTime() - a.date.getTime())
+    }, [diaries])
 
     if (loading) return <div className="loading">일기를 불러오는 중...</div>
 
