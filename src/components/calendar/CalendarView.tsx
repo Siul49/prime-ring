@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { formatDate, getDaysInMonth, getFirstDayOfMonth, addMonths, isSameDay } from '../../lib/utils'
+import { useState, useMemo } from 'react'
+import { formatDate, getDaysInMonth, getFirstDayOfMonth, addMonths } from '../../lib/utils'
 import { useEventStore } from '../../stores/eventStore'
 import { useModalStore } from '../../stores/modalStore'
+import type { Event } from '../../types'
 import './CalendarView.css'
 
 const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토']
@@ -27,7 +28,7 @@ export function CalendarView() {
         openModal(clickedDate)
     }
 
-    const handleEventClick = (e: React.MouseEvent, event: any) => {
+    const handleEventClick = (e: React.MouseEvent, event: Event) => {
         e.stopPropagation()
         useEventStore.getState().setSelectedEvent(event) // 이벤트 클릭 시 수정 모드
         openModal()
@@ -42,13 +43,23 @@ export function CalendarView() {
         calendarDays.push({ day, isCurrentMonth: true })
     }
 
+    // Group events by date for O(1) lookup
+    const eventsByDate = useMemo(() => {
+        const map = new Map<string, typeof events>()
+        events.forEach((event) => {
+            const dateKey = formatDate(event.startDate)
+            if (!map.has(dateKey)) {
+                map.set(dateKey, [])
+            }
+            map.get(dateKey)!.push(event)
+        })
+        return map
+    }, [events])
+
     // Get events for a specific day
     const getEventsForDay = (day: number) => {
-        const dayDate = new Date(year, month, day)
-        return events.filter((event) => {
-            const eventDate = event.startDate
-            return isSameDay(eventDate, dayDate)
-        })
+        const dateKey = formatDate(new Date(year, month, day))
+        return eventsByDate.get(dateKey) || []
     }
 
     return (
