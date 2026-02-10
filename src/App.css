@@ -25,48 +25,45 @@
 }
 
 .header-logo {
-  font-size: 1.25rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-deep-navy);
   letter-spacing: -0.02em;
   white-space: nowrap;
-  text-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
+  font-family: var(--font-serif), serif;
 }
 
 .header-nav {
   display: flex;
   gap: var(--space-1);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-neutral-100);
   padding: 4px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  border: 1px solid var(--color-neutral-200);
 }
 
 .nav-tab {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--color-serene-blue);
   background: transparent;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 2px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .nav-tab:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-deep-navy);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .nav-tab-active {
-  background: rgba(34, 211, 238, 0.15);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(34, 211, 238, 0.2);
+  background: white;
+  color: var(--color-deep-navy);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* 레이아웃 */
@@ -88,19 +85,19 @@
 /* FAB 버튼 */
 .fab {
   position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  width: 52px;
-  height: 52px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  bottom: var(--space-8);
+  right: var(--space-8);
+  width: 60px;
+  height: 60px;
+  background: var(--color-deep-navy);
   border: none;
-  border-radius: var(--radius-full);
-  color: var(--fab-text);
-  font-size: 1.75rem;
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
   font-weight: 300;
   cursor: pointer;
-  box-shadow: var(--primary-glow);
-  transition: all var(--transition-normal);
+  box-shadow: 0 10px 25px rgba(16, 42, 67, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -109,9 +106,9 @@
 }
 
 .fab:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: var(--primary-glow);
-  filter: brightness(1.1);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px rgba(16, 42, 67, 0.3);
+  background: var(--color-neutral-800);
 }
 
 .fab:active {

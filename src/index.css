@@ -1,8 +1,93 @@
-/* ============================================
-   PrimeRing Design System - Light Glassmorphism
-   밝은 테마 + 글래스모피즘
-   ============================================ */
+@import "tailwindcss";
 
+@theme {
+  /* ─── Fonts ─────────────────────────────────────────── */
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+
+  /* ─── Brand Colors ──────────────────────────────────── */
+  --color-deep-navy: #102A43;
+  --color-serene-blue: #486581;
+  --color-cool-white: #F0F4F8;
+  --color-faded-blue: #BCCCDC;
+  --color-grid-line: rgba(16, 42, 67, 0.05);
+
+  /* ─── Neutral Scale (editorial blue-gray palette) ──── */
+  --color-neutral-50: #F0F4F8;
+  --color-neutral-100: #D9E2EC;
+  --color-neutral-200: #BCCCDC;
+  --color-neutral-300: #9FB3C8;
+  --color-neutral-400: #829AB1;
+  --color-neutral-500: #627D98;
+  --color-neutral-600: #486581;
+  --color-neutral-700: #334E68;
+  --color-neutral-800: #243B53;
+  --color-neutral-900: #102A43;
+}
+
+:root {
+  --foreground-rgb: 16, 42, 67;
+}
+
+body {
+  color: var(--color-deep-navy);
+  background-color: var(--color-cool-white);
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Paper Grid Texture ────────────────────────────── */
+.grid-background {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* ─── Digital Grain Texture ─────────────────────────── */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ─── Editorial Layout Utilities ────────────────────── */
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.thin-line {
+  height: 1px;
+  background-color: var(--color-deep-navy);
+  opacity: 0.1;
+}
+
+.diagonal-line {
+  position: absolute;
+  width: 1px;
+  height: 200px;
+  background-color: var(--color-deep-navy);
+  opacity: 0.2;
+  transform: rotate(45deg);
+  transform-origin: top left;
+}
+
+/* Keep basic resets and utility classes that might be needed */
 *,
 *::before,
 *::after {
@@ -11,494 +96,6 @@
   box-sizing: border-box;
 }
 
-:root {
-  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
-
-  /* 스페이싱 */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-
-  /* 라디우스 */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-  --radius-full: 9999px;
-
-  /* 트랜지션 */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============================================
-   Deep Blue - Dark Glassmorphism Theme (기본)
-   딥 블루 다크 글래스모피즘 테마
-   ============================================ */
-:root,
-:root[data-theme="dark"] {
-  /* 배경 - 더 진한 딥 네이비 블루 그라데이션 - 배경을 조금 더 밝고 채도 높게 해서 투명함 강조 */
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.5) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 50%),
-    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-
-  /* 글래스 효과 - 크리스털 클리어 (거의 투명한 배경 + 선명한 화이트 보더) */
-  --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-  --glass-bg-hover: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-  --glass-bg-active: rgba(255, 255, 255, 0.03);
-
-  /* 테두리: 얇고 선명한 화이트 라인 (0.3~0.5 opacity) */
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-border-hover: rgba(255, 255, 255, 0.3);
-  --glass-border-active: rgba(255, 255, 255, 0.5);
-
-  /* 그림자: 내부 발광(inset) + 깊은 외부 그림자 */
-  --glass-shadow:
-    0 8px 32px 0 rgba(0, 0, 0, 0.5),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  /* 이너 보더 효과 */
-
-  --glass-blur: blur(24px);
-
-  /* 프라이머리 - 네온 시안 */
-  --primary: #22d3ee;
-  --primary-light: #67e8f9;
-  --primary-dim: rgba(34, 211, 238, 0.15);
-  --primary-glow: 0 0 20px rgba(34, 211, 238, 0.4);
-
-  /* 텍스트 - 선명한 화이트 */
-  --text-primary: #ffffffe6;
-  /* 90% white */
-  --text-secondary: #ffffff99;
-  /* 60% white */
-  --text-muted: #ffffff66;
-
-  /* 카테고리 색상 - 형광 느낌 */
-  --cat-green: #4ade80;
-  --cat-blue: #60a5fa;
-  --cat-orange: #fb923c;
-  --cat-purple: #c084fc;
-  --cat-pink: #f472b6;
-  --cat-cyan: #22d3ee;
-  --cat-red: #f87171;
-
-  /* 컴포넌트별 색상 */
-  --btn-primary-text: #0f172a;
-  --fab-text: #0f172a;
-  --event-badge-text: #0f172a;
-  --input-bg: rgba(0, 0, 0, 0.2);
-  --input-focus-bg: rgba(255, 255, 255, 0.05);
-  --modal-bg: rgba(15, 23, 42, 0.6);
-  /* 더 투명하게 */
-  --select-arrow: %23cbd5e1;
-  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
-
-  /* 브라우저 네이티브 요소 테마 */
-  color-scheme: dark;
-}
-
-/* ============================================
-   Light Glassmorphism Theme
-   라이트 글래스모피즘 테마
-   ============================================ */
-:root[data-theme="light"] {
-  /* 배경 - 화사한 퓨어 화이트 베이스 + 파스텔톤 블롭 */
-  --bg-gradient:
-    radial-gradient(circle at 0% 0%, rgba(134, 239, 172, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(167, 139, 250, 0.4) 0%, transparent 40%),
-    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-
-  /* 글래스 효과 - 순수 투명 유리 */
-  --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
-  --glass-bg-hover: linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
-  --glass-bg-active: rgba(255, 255, 255, 0.2);
-
-  /* 테두리: 선명한 화이트 라인 */
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-border-hover: rgba(255, 255, 255, 0.9);
-  --glass-border-active: rgba(34, 197, 94, 0.4);
-
-  /* 그림자: 얇은 외곽선 느낌 */
-  --glass-shadow:
-    0 8px 32px 0 rgba(30, 41, 59, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
-
-  --glass-blur: blur(20px);
-
-  /* 프라이머리 - 비비드 그린 */
-  --primary: #10b981;
-  --primary-light: #34d399;
-  --primary-dim: rgba(16, 185, 129, 0.1);
-  --primary-glow: 0 4px 20px rgba(16, 185, 129, 0.2);
-
-  /* 텍스트 - 진한 잉크 블랙 */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-
-  /* 카테고리 색상 */
-  --cat-green: #22C55E;
-  --cat-blue: #3B82F6;
-  --cat-orange: #F97316;
-  --cat-purple: #8B5CF6;
-  --cat-pink: #EC4899;
-  --cat-cyan: #06B6D4;
-  --cat-red: #EF4444;
-
-  /* 컴포넌트별 색상 */
-  --btn-primary-text: white;
-  --fab-text: white;
-  --event-badge-text: white;
-  --input-bg: rgba(255, 255, 255, 0.4);
-  --input-focus-bg: rgba(255, 255, 255, 0.7);
-  --modal-bg: rgba(255, 255, 255, 0.7);
-  --select-arrow: %23475569;
-  --scrollbar-thumb: rgba(0, 0, 0, 0.1);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
-
-  /* 브라우저 네이티브 요소 테마 */
-  /* 브라우저 네이티브 요소 테마 */
-  color-scheme: light;
-}
-
-/* ============================================
-   Color Modes (Themes)
-   색상 모드 오버라이드
-   ============================================ */
-
-/* Forest (Original Green) - Default */
-[data-mode="forest"] {
-  --primary: #22C55E;
-  --primary-light: #4ADE80;
-  --primary-dim: rgba(34, 197, 94, 0.12);
-  --primary-glow: 0 4px 20px rgba(34, 197, 94, 0.25);
-}
-
-/* Ocean (Blue) */
-[data-mode="ocean"] {
-  --primary: #0ea5e9;
-  --primary-light: #38bdf8;
-  --primary-dim: rgba(14, 165, 233, 0.12);
-  --primary-glow: 0 4px 20px rgba(14, 165, 233, 0.25);
-}
-
-/* Sunset (Orange/Red) */
-[data-mode="sunset"] {
-  --primary: #f97316;
-  --primary-light: #fb923c;
-  --primary-dim: rgba(249, 115, 22, 0.12);
-  --primary-glow: 0 4px 20px rgba(249, 115, 22, 0.25);
-}
-
-/* Berry (Pink/Purple) */
-[data-mode="berry"] {
-  --primary: #d946ef;
-  --primary-light: #e879f9;
-  --primary-dim: rgba(217, 70, 239, 0.12);
-  --primary-glow: 0 4px 20px rgba(217, 70, 239, 0.25);
-}
-
-/* Midnight (Monochrome/Violet) */
-[data-mode="midnight"] {
-  --primary: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dim: rgba(99, 102, 241, 0.12);
-  --primary-glow: 0 4px 20px rgba(99, 102, 241, 0.25);
-}
-
-/* Background Gradients for Light Mode */
-[data-theme="light"][data-mode="forest"] {
-  --bg-gradient: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 50%, #f5f5f5 100%);
-}
-
-[data-theme="light"][data-mode="ocean"] {
-  --bg-gradient: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #f5f5f5 100%);
-}
-
-[data-theme="light"][data-mode="sunset"] {
-  --bg-gradient: linear-gradient(180deg, #fff7ed 0%, #ffedd5 50%, #f5f5f5 100%);
-}
-
-[data-theme="light"][data-mode="berry"] {
-  --bg-gradient: linear-gradient(180deg, #fdf4ff 0%, #fae8ff 50%, #f5f5f5 100%);
-}
-
-[data-theme="light"][data-mode="midnight"] {
-  --bg-gradient: linear-gradient(180deg, #eef2ff 0%, #e0e7ff 50%, #f5f5f5 100%);
-}
-
-/* Background Gradients for Dark Mode */
-[data-theme="dark"][data-mode="forest"] {
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(34, 197, 94, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #052e16 0%, #14532d 100%);
-}
-
-[data-theme="dark"][data-mode="ocean"] {
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
-}
-
-[data-theme="dark"][data-mode="sunset"] {
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(251, 146, 60, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #431407 0%, #7c2d12 100%);
-}
-
-[data-theme="dark"][data-mode="berry"] {
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(217, 70, 239, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(232, 121, 249, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #4a044e 0%, #701a75 100%);
-}
-
-[data-theme="dark"][data-mode="midnight"] {
-  --bg-gradient:
-    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-}
-
-/* ============================================
-   베이스 스타일
-   ============================================ */
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family: var(--font-sans);
-  background: var(--bg-gradient);
-  background-attachment: fixed;
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.5;
-  overflow-x: hidden;
-}
-
 #root {
   min-height: 100vh;
-}
-
-/* ============================================
-   글래스 패널
-   ============================================ */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--glass-shadow);
-  transition: all var(--transition-normal);
-}
-
-.glass:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-}
-
-/* ============================================
-   버튼
-   ============================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.btn:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: var(--btn-primary-text);
-  font-weight: 600;
-  border: none;
-  box-shadow: var(--primary-glow);
-}
-
-.btn-primary:hover {
-  box-shadow: 0 6px 24px rgba(34, 211, 238, 0.45);
-  filter: brightness(1.1);
-}
-
-.btn-ghost {
-  background: transparent;
-  border-color: transparent;
-}
-
-.btn-ghost:hover {
-  background: var(--primary-dim);
-  border-color: var(--glass-border-active);
-}
-
-.btn-icon {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: var(--radius-lg);
-  font-size: 1.1rem;
-}
-
-/* Floating Action Button */
-.fab {
-  position: fixed;
-  bottom: var(--space-8);
-  right: var(--space-8);
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  border: none;
-  border-radius: var(--radius-full);
-  color: var(--fab-text);
-  font-size: 1.75rem;
-  font-weight: 300;
-  cursor: pointer;
-  box-shadow: var(--primary-glow);
-  transition: all var(--transition-normal);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fab:hover {
-  transform: scale(1.1) translateY(-4px);
-  box-shadow:
-    0 12px 32px rgba(34, 211, 238, 0.5),
-    0 0 0 8px rgba(34, 211, 238, 0.15);
-}
-
-.fab:active {
-  transform: scale(1.05);
-}
-
-/* ============================================
-   입력 필드
-   ============================================ */
-.input {
-  width: 100%;
-  padding: var(--space-4);
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--text-primary);
-  background: var(--input-bg);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  outline: none;
-  transition: all var(--transition-fast);
-}
-
-.input::placeholder {
-  color: var(--text-muted);
-}
-
-.input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--primary-dim);
-  background: var(--input-focus-bg);
-}
-
-select.input {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 40px;
-}
-
-/* ============================================
-   스크롤바
-   ============================================ */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
-}
-
-/* ============================================
-   애니메이션
-   ============================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }

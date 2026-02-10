@@ -4,7 +4,6 @@ import { useCategoryStore } from '../../stores/categoryStore'
 import { useTheme } from '../../hooks/useTheme'
 import { useAppStore } from '../../stores/appStore'
 import type { ColorMode } from '../../types'
-import './SettingsModal.css'
 
 const THEME_OPTIONS: { mode: ColorMode; name: string; color: string }[] = [
     { mode: 'forest', name: '포레스트', color: '#22c55e' },
@@ -40,112 +39,126 @@ export function SettingsModal() {
     }
 
     return (
-        <div className="modal-overlay" onClick={closeSettings}>
-            <div className="modal-content glass settings-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>⚙️ 설정</h2>
-                    <button className="modal-close" onClick={closeSettings}>✕</button>
-                </div>
+        <div className="fixed inset-0 bg-deep-navy/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4" onClick={closeSettings}>
+            <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
+                <header className="px-8 py-6 border-b border-deep-navy/5 flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-deep-navy font-serif">Settings</h2>
+                    <button className="text-serene-blue/40 hover:text-deep-navy transition-colors" onClick={closeSettings}>✕</button>
+                </header>
 
-                <div className="settings-tabs">
+                <nav className="flex px-8 border-b border-deep-navy/5">
                     <button
-                        className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`}
+                        className={`py-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative ${activeTab === 'general' ? 'text-deep-navy' : 'text-serene-blue/40 hover:text-serene-blue'}`}
                         onClick={() => setActiveTab('general')}
                     >
-                        일반
+                        General
+                        {activeTab === 'general' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-deep-navy" />}
                     </button>
                     <button
-                        className={`tab-btn ${activeTab === 'category' ? 'active' : ''}`}
+                        className={`ml-8 py-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative ${activeTab === 'category' ? 'text-deep-navy' : 'text-serene-blue/40 hover:text-serene-blue'}`}
                         onClick={() => setActiveTab('category')}
                     >
-                        카테고리 관리
+                        Categories
+                        {activeTab === 'category' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-deep-navy" />}
                     </button>
-                </div>
+                </nav>
 
-                <div className="settings-body">
+                <div className="p-8 max-h-[60vh] overflow-y-auto">
                     {activeTab === 'general' && (
-                        <div className="settings-section">
-                            <h3>테마 설정</h3>
-                            <div className="setting-item">
-                                <span>다크 모드</span>
-                                <button className="btn" onClick={toggleTheme}>
-                                    {theme === 'dark' ? '🌙 켜짐' : '☀️ 꺼짐'}
-                                </button>
-                            </div>
-
-                            <h3 style={{ marginTop: '24px' }}>컬러 테마</h3>
-                            <div className="theme-grid">
-                                {THEME_OPTIONS.map((option) => (
+                        <div className="space-y-10">
+                            <section>
+                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 mb-6">Appearance</h3>
+                                <div className="flex items-center justify-between p-4 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-xl">
+                                    <span className="text-sm font-medium text-deep-navy">Dark Mode</span>
                                     <button
-                                        key={option.mode}
-                                        className={`theme-card ${colorMode === option.mode ? 'selected' : ''}`}
-                                        onClick={() => setColorMode(option.mode)}
+                                        className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${theme === 'dark' ? 'bg-deep-navy text-white' : 'bg-white text-serene-blue ring-1 ring-deep-navy/10'}`}
+                                        onClick={toggleTheme}
                                     >
-                                        <div className="theme-preview" style={{ background: option.color }}></div>
-                                        <span className="theme-name">{option.name}</span>
+                                        {theme === 'dark' ? 'On' : 'Off'}
                                     </button>
-                                ))}
-                            </div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 mb-6">Color Accent</h3>
+                                <div className="grid grid-cols-5 gap-3">
+                                    {THEME_OPTIONS.map((option) => (
+                                        <button
+                                            key={option.mode}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all ${colorMode === option.mode ? 'bg-neutral-50 ring-1 ring-deep-navy/10' : 'hover:bg-neutral-50/50'}`}
+                                            onClick={() => setColorMode(option.mode)}
+                                        >
+                                            <div className="w-6 h-6 rounded-full shadow-inner" style={{ background: option.color }}></div>
+                                            <span className="text-[9px] font-bold text-serene-blue/60 uppercase">{option.mode}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
                     )}
 
                     {activeTab === 'category' && (
-                        <div className="settings-section">
-                            <h3>새 카테고리 추가</h3>
-                            <div className="add-category-form">
-                                <div className="form-row">
-                                    <input
-                                        type="text"
-                                        placeholder="이름"
-                                        value={newCatName}
-                                        onChange={(e) => setNewCatName(e.target.value)}
-                                        className="input cat-input"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="아이콘"
-                                        value={newCatIcon}
-                                        onChange={(e) => setNewCatIcon(e.target.value)}
-                                        className="input cat-icon-input"
-                                        maxLength={2}
-                                    />
-                                </div>
-
-                                <div className="color-palette">
-                                    {['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#64748b'].map((color) => (
-                                        <button
-                                            key={color}
-                                            className={`color-swatch ${newCatColor === color ? 'selected' : ''}`}
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => setNewCatColor(color)}
-                                            aria-label={`Select color ${color}`}
+                        <div className="space-y-10">
+                            <section>
+                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 mb-6">Add New Category</h3>
+                                <div className="p-6 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-xl space-y-4">
+                                    <div className="flex gap-3">
+                                        <input
+                                            type="text"
+                                            placeholder="Category Name"
+                                            value={newCatName}
+                                            onChange={(e) => setNewCatName(e.target.value)}
+                                            className="flex-1 px-4 py-2 bg-white ring-1 ring-deep-navy/5 rounded-lg text-sm outline-none focus:ring-deep-navy/10"
                                         />
+                                        <input
+                                            type="text"
+                                            placeholder="Icon"
+                                            value={newCatIcon}
+                                            onChange={(e) => setNewCatIcon(e.target.value)}
+                                            className="w-16 px-2 py-2 bg-white ring-1 ring-deep-navy/5 rounded-lg text-center text-sm outline-none"
+                                            maxLength={2}
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#64748b'].map((color) => (
+                                            <button
+                                                key={color}
+                                                className={`w-6 h-6 rounded-full ring-2 ring-offset-2 transition-all ${newCatColor === color ? 'ring-deep-navy scale-110' : 'ring-transparent'}`}
+                                                style={{ backgroundColor: color }}
+                                                onClick={() => setNewCatColor(color)}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        className="w-full py-2 bg-deep-navy text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-all"
+                                        onClick={handleAddCategory}
+                                    >
+                                        Add Category
+                                    </button>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 mb-6">Existing Categories</h3>
+                                <div className="space-y-2">
+                                    {categories.map((cat) => (
+                                        <div key={cat.id} className="flex items-center justify-between p-4 bg-white ring-1 ring-deep-navy/5 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg" style={{ color: cat.color }}>{cat.icon}</span>
+                                                <span className="text-sm font-medium text-deep-navy">{cat.name}</span>
+                                            </div>
+                                            <button
+                                                className="p-2 text-serene-blue/20 hover:text-red-400 transition-colors"
+                                                onClick={() => deleteCategory(cat.id)}
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
                                     ))}
                                 </div>
-
-                                <button className="btn btn-primary btn-full" onClick={handleAddCategory}>
-                                    카테고리 추가
-                                </button>
-                            </div>
-
-                            <h3 style={{ marginTop: '20px' }}>카테고리 목록</h3>
-                            <ul className="category-list">
-                                {categories.map((cat) => (
-                                    <li key={cat.id} className="category-list-item">
-                                        <div className="cat-info">
-                                            <span style={{ color: cat.color }}>{cat.icon}</span>
-                                            <span>{cat.name}</span>
-                                        </div>
-                                        <button
-                                            className="btn-delete-cat"
-                                            onClick={() => deleteCategory(cat.id)}
-                                            style={{ color: '#ef4444', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                                        >
-                                            🗑️
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            </section>
                         </div>
                     )}
                 </div>

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { formatDate, getDaysInMonth, getFirstDayOfMonth, addMonths, isSameDay } from '../../lib/utils'
 import { useEventStore } from '../../stores/eventStore'
 import { useModalStore } from '../../stores/modalStore'
-import './CalendarView.css'
 
 const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -52,74 +51,100 @@ export function CalendarView() {
     }
 
     return (
-        <>
-            <div className="calendar-view">
-                <div className="calendar-header glass">
-                    <div className="calendar-nav">
-                        <button className="btn btn-icon calendar-nav-btn" onClick={prevMonth}>
-                            ◀
+        <div className="calendar-view !bg-transparent !border-none !shadow-none !p-0">
+            <header className="flex items-end justify-between mb-8">
+                <div>
+                    <h2 className="text-3xl font-bold text-deep-navy font-serif tracking-tight">
+                        {year}. {month + 1}
+                    </h2>
+                    <p className="text-serene-blue/60 text-xs font-medium uppercase tracking-widest mt-1">
+                        Monthly Overview
+                    </p>
+                </div>
+                <div className="flex items-center gap-6">
+                    <div className="flex gap-2">
+                        <button
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-all ring-1 ring-deep-navy/5"
+                            onClick={prevMonth}
+                        >
+                            <span className="opacity-40 text-xs">◀</span>
                         </button>
-                        <h2 className="calendar-title">
-                            {year}년 {month + 1}월
-                        </h2>
-                        <button className="btn btn-icon calendar-nav-btn" onClick={nextMonth}>
-                            ▶
+                        <button
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-all ring-1 ring-deep-navy/5"
+                            onClick={nextMonth}
+                        >
+                            <span className="opacity-40 text-xs">▶</span>
                         </button>
                     </div>
-                    <div className="calendar-actions">
-                        <button className="btn" onClick={goToday}>오늘</button>
-                        <button className="btn btn-primary" onClick={() => {
+                    <button
+                        className="text-[11px] font-bold uppercase tracking-wider text-deep-navy/40 hover:text-deep-navy transition-colors"
+                        onClick={goToday}
+                    >
+                        Today
+                    </button>
+                    <button
+                        className="px-6 py-2 bg-deep-navy text-white text-[11px] font-bold uppercase tracking-widest rounded-full hover:bg-neutral-800 transition-all shadow-lg shadow-deep-navy/10"
+                        onClick={() => {
                             useEventStore.getState().setSelectedEvent(null);
                             openModal(new Date())
-                        }}>
-                            ➕ 새 일정
-                        </button>
-                    </div>
+                        }}
+                    >
+                        Add Event
+                    </button>
+                </div>
+            </header>
+
+            <div className="calendar-grid bg-white/40 backdrop-blur-sm ring-1 ring-deep-navy/5 rounded-lg overflow-hidden flex flex-col min-h-0">
+                <div className="grid grid-cols-7 border-b border-deep-navy/5">
+                    {DAYS_OF_WEEK.map((day, idx) => (
+                        <div
+                            key={idx}
+                            className="py-4 text-center text-[10px] font-bold uppercase tracking-widest text-serene-blue/40"
+                        >
+                            {day}
+                        </div>
+                    ))}
                 </div>
 
-                <div className="calendar-grid glass">
-                    <div className="calendar-weekdays">
-                        {DAYS_OF_WEEK.map((day, idx) => (
-                            <div key={idx} className="weekday">{day}</div>
-                        ))}
-                    </div>
+                <div className="grid grid-cols-7 flex-1 min-h-0">
+                    {calendarDays.map((item, idx) => {
+                        const dayEvents = item.day ? getEventsForDay(item.day) : []
+                        const isToday = item.day && isSameDay(new Date(year, month, item.day), new Date())
 
-                    <div className="calendar-days">
-                        {calendarDays.map((item, idx) => {
-                            const dayEvents = item.day ? getEventsForDay(item.day) : []
-                            const isToday = item.day && formatDate(new Date(year, month, item.day)) === formatDate(new Date())
-
-                            return (
-                                <div
-                                    key={idx}
-                                    className={`day-cell ${!item.isCurrentMonth ? 'day-cell-inactive' : ''} ${isToday ? 'day-cell-today' : ''}`}
-                                    onClick={() => item.day && handleDayClick(item.day)}
-                                >
-                                    {item.day && (
-                                        <>
-                                            <span className="day-number">{item.day}</span>
-                                            <div className="day-events">
-                                                {dayEvents.slice(0, 3).map((event) => (
-                                                    <div
-                                                        key={event.id}
-                                                        className="event-badge"
-                                                        onClick={(e) => handleEventClick(e, event)}
-                                                    >
-                                                        {event.title}
-                                                    </div>
-                                                ))}
-                                                {dayEvents.length > 3 && (
-                                                    <div className="event-more">+{dayEvents.length - 3}</div>
-                                                )}
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            )
-                        })}
-                    </div>
+                        return (
+                            <div
+                                key={idx}
+                                className={`min-h-[120px] p-2 border-r border-b border-deep-navy/5 flex flex-col relative transition-colors ${!item.isCurrentMonth ? 'bg-neutral-50/30' : 'hover:bg-white/60'} ${isToday ? 'after:absolute after:top-2 after:right-2 after:w-1.5 after:h-1.5 after:bg-deep-navy after:rounded-full' : ''}`}
+                                onClick={() => item.day && handleDayClick(item.day)}
+                            >
+                                {item.day && (
+                                    <>
+                                        <span className={`text-xs font-bold ${isToday ? 'text-deep-navy' : 'text-serene-blue/40'} mb-2`}>
+                                            {item.day}
+                                        </span>
+                                        <div className="space-y-1">
+                                            {dayEvents.slice(0, 3).map((event) => (
+                                                <div
+                                                    key={event.id}
+                                                    className="text-[10px] font-medium text-deep-navy px-2 py-1 bg-white ring-1 ring-deep-navy/5 rounded shadow-sm truncate hover:ring-deep-navy/20 transition-all"
+                                                    onClick={(e) => handleEventClick(e, event)}
+                                                >
+                                                    {event.title}
+                                                </div>
+                                            ))}
+                                            {dayEvents.length > 3 && (
+                                                <div className="text-[9px] font-bold text-serene-blue/40 px-2">
+                                                    + {dayEvents.length - 3} more
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
-        </>
+        </div>
     )
 }
