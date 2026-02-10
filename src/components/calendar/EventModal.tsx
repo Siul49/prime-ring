@@ -4,7 +4,6 @@ import { Timestamp } from 'firebase/firestore'
 import { useEventStore } from '../../stores/eventStore'
 import { useCategoryStore } from '../../stores/categoryStore'
 import { formatDate } from '../../lib/utils'
-import './EventModal.css'
 
 interface EventModalProps {
     isOpen: boolean
@@ -108,19 +107,22 @@ export function EventModal({ isOpen, onClose, initialDate }: EventModalProps) {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>{selectedEvent ? '📝 일정 수정' : '✨ 새 일정'}</h2>
-                    <button className="modal-close" onClick={onClose}>✕</button>
-                </div>
+        <div className="fixed inset-0 bg-deep-navy/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4" onClick={onClose}>
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
+                <header className="px-8 py-6 border-b border-deep-navy/5 flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-deep-navy font-serif">
+                        {selectedEvent ? 'Edit Event' : 'New Event'}
+                    </h2>
+                    <button className="text-serene-blue/40 hover:text-deep-navy transition-colors" onClick={onClose}>✕</button>
+                </header>
 
-                <form onSubmit={handleSubmit} className="modal-form">
-                    <div className="form-group">
+                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Title</label>
                         <input
                             type="text"
-                            className="input"
-                            placeholder="일정 제목을 입력하세요..."
+                            className="w-full px-4 py-3 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-lg focus:ring-deep-navy/20 outline-none transition-all text-deep-navy placeholder:text-serene-blue/20"
+                            placeholder="What's happening?"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
@@ -128,101 +130,99 @@ export function EventModal({ isOpen, onClose, initialDate }: EventModalProps) {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">📅 날짜</label>
-                        <input
-                            type="date"
-                            className="input"
-                            value={formatDate(startDate)}
-                            onChange={(e) => setStartDate(new Date(e.target.value))}
-                        />
-                    </div>
-
-                    {/* Custom Category Dropdown */}
-                    <div className="form-group">
-                        <label className="form-label">📁 카테고리</label>
-                        <div
-                            className="custom-select-trigger"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                setIsCategoryOpen(!isCategoryOpen)
-                            }}
-                        >
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                {selectedCategory?.icon} {selectedCategory?.name}
-                            </span>
-                            <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>▼</span>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Date</label>
+                            <input
+                                type="date"
+                                className="w-full px-4 py-3 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-lg focus:ring-deep-navy/20 outline-none transition-all text-deep-navy text-sm"
+                                value={formatDate(startDate)}
+                                onChange={(e) => setStartDate(new Date(e.target.value))}
+                            />
                         </div>
 
-                        {isCategoryOpen && (
-                            <>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Category</label>
+                            <div className="relative">
                                 <div
-                                    className="fixed inset-0"
-                                    style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                                    className="w-full px-4 py-3 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-lg focus:ring-deep-navy/20 outline-none transition-all text-deep-navy text-sm flex items-center justify-between cursor-pointer"
                                     onClick={(e) => {
                                         e.stopPropagation()
-                                        setIsCategoryOpen(false)
+                                        setIsCategoryOpen(!isCategoryOpen)
                                     }}
-                                />
-                                <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
-                                    {categories.map((cat) => (
-                                        <div
-                                            key={cat.id}
-                                            className={`custom-select-option ${categoryId === cat.id ? 'selected' : ''}`}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                setCategoryId(cat.id)
-                                                setIsCategoryOpen(false)
-                                            }}
-                                        >
-                                            {cat.icon} {cat.name}
-                                        </div>
-                                    ))}
+                                >
+                                    <span className="flex items-center gap-2">
+                                        {selectedCategory?.icon} {selectedCategory?.name}
+                                    </span>
+                                    <span className="text-[8px] opacity-20">▼</span>
                                 </div>
-                            </>
-                        )}
+
+                                {isCategoryOpen && (
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white ring-1 ring-deep-navy/5 shadow-xl rounded-lg overflow-hidden z-[1100]">
+                                        {categories.map((cat) => (
+                                            <div
+                                                key={cat.id}
+                                                className={`px-4 py-3 text-sm cursor-pointer hover:bg-neutral-50 flex items-center gap-2 ${categoryId === cat.id ? 'bg-neutral-50 text-deep-navy font-bold' : 'text-serene-blue'}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setCategoryId(cat.id)
+                                                    setIsCategoryOpen(false)
+                                                }}
+                                            >
+                                                {cat.icon} {cat.name}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-checkbox">
-                            <input
-                                type="checkbox"
-                                checked={allDay}
-                                onChange={(e) => setAllDay(e.target.checked)}
-                            />
-                            <span>하루 종일</span>
-                        </label>
+                    <div className="flex items-center gap-3 px-1">
+                        <input
+                            type="checkbox"
+                            id="allDay"
+                            className="w-4 h-4 rounded border-deep-navy/10 text-deep-navy focus:ring-deep-navy/20"
+                            checked={allDay}
+                            onChange={(e) => setAllDay(e.target.checked)}
+                        />
+                        <label htmlFor="allDay" className="text-xs font-medium text-serene-blue/60 cursor-pointer select-none">All Day Event</label>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">📝 설명</label>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Description</label>
                         <textarea
-                            className="input form-textarea"
-                            placeholder="설명 (선택사항)"
+                            className="w-full px-4 py-3 bg-neutral-50 ring-1 ring-deep-navy/5 rounded-lg focus:ring-deep-navy/20 outline-none transition-all text-deep-navy text-sm placeholder:text-serene-blue/20 resize-none"
+                            placeholder="Add details..."
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
                         />
                     </div>
 
-                    <div className="modal-actions">
+                    <div className="flex gap-4 pt-4">
                         {selectedEvent && (
                             <button
                                 type="button"
-                                className="btn"
+                                className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-500 transition-colors mr-auto"
                                 onClick={handleDelete}
-                                style={{
-                                    marginRight: 'auto',
-                                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                                    color: '#f87171',
-                                    border: '1px solid rgba(239, 68, 68, 0.3)'
-                                }}
                             >
-                                🗑️ 삭제
+                                Delete
                             </button>
                         )}
-                        <button type="button" className="btn" onClick={onClose}>취소</button>
-                        <button type="submit" className="btn btn-primary">저장</button>
+                        <button
+                            type="button"
+                            className="px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-serene-blue/40 hover:text-deep-navy transition-colors"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-8 py-2 bg-deep-navy text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-neutral-800 transition-all shadow-lg shadow-deep-navy/10"
+                        >
+                            Save Event
+                        </button>
                     </div>
                 </form>
             </div>

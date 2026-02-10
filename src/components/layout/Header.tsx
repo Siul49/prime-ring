@@ -1,17 +1,24 @@
 import { useTheme } from '../../hooks/useTheme'
 import { useModalStore } from '../../stores/modalStore'
-import './Header.css'
 
 export function Header() {
     const { theme, toggleTheme } = useTheme()
     const { openSettings } = useModalStore()
 
     return (
-        <div className="header-controls">
-            <button className="btn btn-ghost btn-icon" onClick={toggleTheme} title="테마 변경">
+        <div className="flex gap-4 items-center">
+            <button
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+                onClick={toggleTheme}
+                title="테마 변경"
+            >
                 {theme === 'dark' ? '🌙' : '☀️'}
             </button>
-            <button className="btn btn-ghost btn-icon" onClick={openSettings} title="설정">
+            <button
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+                onClick={openSettings}
+                title="설정"
+            >
                 ⚙️
             </button>
         </div>

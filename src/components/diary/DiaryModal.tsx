@@ -3,7 +3,6 @@ import { useDiaryStore } from '../../stores/diaryStore'
 import { aiService, type AIAnalysisResult } from '../../services/aiService'
 import { toast } from 'react-hot-toast'
 import type { Diary } from '../../types'
-import './DiaryModal.css'
 
 interface DiaryModalProps {
     isOpen: boolean
@@ -100,105 +99,141 @@ export function DiaryModal({ isOpen, onClose, initialDate, existingDiary }: Diar
 
     if (!isOpen) return null
 
-    return (
-        <div className="diary-modal-backdrop" onClick={onClose}>
-            <div className="diary-modal glass" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>{existingDiary ? '기록 수정' : '오늘의 기록'}</h2>
-                    <div className="modal-date">{date.toLocaleDateString()}</div>
-                </div>
+    function getMoodEmoji(mood: string) {
+        switch (mood) {
+            case 'happy': return '😊'
+            case 'sad': return '😢'
+            case 'angry': return '😡'
+            case 'excited': return '🤩'
+            case 'neutral': return '😐'
+            default: return mood // Return the emoji itself if it's already an emoji
+        }
+    }
 
-                <div className="diary-form">
-                    <div className="form-group">
-                        <label>오늘의 기분</label>
-                        <div className="mood-selector">
+    return (
+        <div className="fixed inset-0 bg-deep-navy/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4" onClick={onClose}>
+            <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+                <header className="px-8 py-6 border-b border-deep-navy/5 flex items-center justify-between flex-shrink-0">
+                    <div>
+                        <h2 className="text-xl font-bold text-deep-navy font-serif">
+                            {existingDiary ? 'Edit Entry' : 'New Journal Entry'}
+                        </h2>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/40 mt-1">
+                            {date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                    </div>
+                    <button className="text-serene-blue/40 hover:text-deep-navy transition-colors" onClick={onClose}>✕</button>
+                </header>
+
+                <div className="p-8 space-y-8 overflow-y-auto flex-1">
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Today's Mood</label>
+                        <div className="flex gap-3">
                             {MOODS.map((m) => (
                                 <button
                                     key={m}
                                     type="button"
-                                    className={`mood-btn ${mood === m ? 'selected' : ''}`}
+                                    className={`text-2xl p-4 rounded-xl transition-all ${mood === m ? 'bg-neutral-100 ring-1 ring-deep-navy/10 scale-110' : 'opacity-40 hover:opacity-100 hover:bg-neutral-50'}`}
                                     onClick={() => setMood(m)}
                                     title={m}
                                 >
-                                    {m}
+                                    {getMoodEmoji(m)}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>제목</label>
-                        <input
-                            type="text"
-                            className="input"
-                            placeholder="오늘의 제목을 지어주세요"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Title</label>
+                            <input
+                                type="text"
+                                className="w-full px-0 py-2 bg-transparent border-b border-deep-navy/10 focus:border-deep-navy outline-none transition-all text-xl font-bold text-deep-navy placeholder:text-serene-blue/20"
+                                placeholder="Give this moment a name..."
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                required
+                            />
+                        </div>
 
-                    <div className="form-group" style={{ flex: 1 }}>
-                        <label>내용</label>
-                        <textarea
-                            className="input"
-                            placeholder="무슨 일이 있었나요?"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            style={{ height: '300px', resize: 'none' }}
-                            required
-                        />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-serene-blue/60 ml-1">Content</label>
+                            <textarea
+                                className="w-full px-0 py-2 bg-transparent focus:outline-none transition-all text-deep-navy leading-relaxed placeholder:text-serene-blue/20 resize-none min-h-[200px]"
+                                placeholder="Write your thoughts here..."
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                required
+                            />
+                        </div>
                     </div>
 
                     {/* AI Analysis Section */}
-                    <div className="ai-section">
+                    <div className="pt-8 border-t border-deep-navy/5">
                         {!aiResult && !isAnalyzing && (
-                            <button type="button" className="btn btn-ai" onClick={handleAnalyze}>
-                                ✨ AI 요약 및 흐름 분석 (Local)
+                            <button
+                                type="button"
+                                className="w-full py-4 bg-neutral-50 hover:bg-neutral-100 border border-deep-navy/5 rounded-xl text-[11px] font-bold uppercase tracking-widest text-deep-navy transition-all flex items-center justify-center gap-2 group"
+                                onClick={handleAnalyze}
+                            >
+                                <span className="group-hover:rotate-12 transition-transform">✨</span>
+                                AI Reflection & Flow Analysis
                             </button>
                         )}
 
                         {isAnalyzing && (
-                            <div className="ai-loading">
-                                <div className="spinner-sm" />
-                                <span>{aiProgress || 'AI가 생각하는 중...'}</span>
+                            <div className="py-8 text-center space-y-4 bg-neutral-50 rounded-xl border border-dashed border-deep-navy/10">
+                                <div className="w-5 h-5 border-2 border-deep-navy/10 border-t-deep-navy rounded-full animate-spin mx-auto" />
+                                <p className="text-[11px] font-bold uppercase tracking-widest text-serene-blue/60">
+                                    {aiProgress || 'Analyzing your day...'}
+                                </p>
                             </div>
                         )}
 
                         {aiResult && (
-                            <div className="ai-result-card">
-                                <div className="ai-summary">
-                                    <span className="ai-label">📝 요약</span>
-                                    <p>{aiResult.summary}</p>
+                            <div className="space-y-8 bg-neutral-50 p-8 rounded-2xl border border-deep-navy/5">
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-deep-navy mb-4 block">Summary</span>
+                                    <p className="text-sm text-serene-blue/80 leading-relaxed italic">"{aiResult.summary}"</p>
                                 </div>
-                                <div className="ai-flow">
-                                    <span className="ai-label">🔗 하루의 흐름</span>
-                                    <div className="flow-steps">
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-deep-navy mb-4 block">Day Flow</span>
+                                    <div className="space-y-4 pl-4 border-l-2 border-deep-navy/5">
                                         {aiResult.flow.map((step, idx) => (
-                                            <div key={idx} className="flow-step">
-                                                <span className="step-dot" />
+                                            <div key={idx} className="relative text-xs text-serene-blue font-medium">
+                                                <div className="absolute -left-[21px] top-1 w-2 h-2 bg-white ring-2 ring-deep-navy/10 rounded-full" />
                                                 {step}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="ai-tips">
-                                    <span className="ai-label">💡 AI의 한마디</span>
-                                    <p>{aiResult.tips}</p>
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-deep-navy mb-4 block">AI Insight</span>
+                                    <div className="bg-white p-4 rounded-lg ring-1 ring-deep-navy/5 shadow-sm text-xs text-serene-blue/80 leading-relaxed">
+                                        {aiResult.tips}
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
-
-                    <div className="form-actions">
-                        <button type="button" className="btn btn-ghost" onClick={onClose}>
-                            취소
-                        </button>
-                        <button type="button" className="btn btn-primary" onClick={handleSave}>
-                            저장
-                        </button>
-                    </div>
                 </div>
+
+                <footer className="px-8 py-6 border-t border-deep-navy/5 flex justify-end gap-4 flex-shrink-0">
+                    <button
+                        type="button"
+                        className="px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-serene-blue/40 hover:text-deep-navy transition-colors"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        className="px-10 py-2 bg-deep-navy text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-neutral-800 transition-all shadow-lg shadow-deep-navy/10"
+                        onClick={handleSave}
+                    >
+                        Save Journal
+                    </button>
+                </footer>
             </div>
         </div>
     )

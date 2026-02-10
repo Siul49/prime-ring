@@ -27,7 +27,9 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app relative">
+      <div className="grid-background" />
+      <div className="grain-overlay" />
       <Toaster
         position="top-center"
         containerStyle={{
@@ -60,11 +62,13 @@ function App() {
           },
         }}
       />
-      <div className="app-content">
-        <header className="app-header glass">
-          <h1 className="header-logo">🌟 PrimeRing</h1>
+      <div className="app-content relative z-10">
+        <header className="app-header border-b border-deep-navy/10 py-6">
+          <h1 className="header-logo !text-deep-navy !bg-none !bg-clip-border !fill-none">
+            🌟 PrimeRing
+          </h1>
 
-          <nav className="header-nav">
+          <nav className="header-nav bg-neutral-100/50 border-neutral-200">
             <button
               className={`nav-tab ${currentView === 'month' ? 'nav-tab-active' : ''}`}
               onClick={() => setCurrentView('month')}
