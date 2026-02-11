@@ -1,6 +1,6 @@
 # PrimeRing
 
-AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데스크톱 애플리케이션
+AI 기반 요약 및 하루 흐름 분석을 지원하는 스마트 캘린더 & 다이어리 데스크톱 애플리케이션
 
 ## 📋 목차
 
@@ -17,10 +17,12 @@ AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데�
 ## ✨ 주요 기능
 
 - 📅 **스마트 캘린더**: 월간 뷰로 이벤트를 쉽게 관리
+
 - 📝 **AI 다이어리**: WebLLM(Llama 3.2 3B)을 활용한 로컬 온디바이스 감정 분석
 - 🏷️ **카테고리 관리**: 커스텀 카테고리 생성 및 색상 설정
 - 🌓 **테마 전환**: 라이트/다크 모드 지원
 - 💾 **로컬 데이터 저장**: 사용자 문서 폴더 내 JSON 파일 기반 보안 저장
+
 - 🖥️ **크로스 플랫폼**: Electron 기반 Windows/macOS/Linux 지원
 
 ## 🔧 기술 스택
@@ -29,8 +31,9 @@ AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데�
 - **빌드 도구**: Vite
 - **상태 관리**: Zustand
 - **UI 라이브러리**: Framer Motion, React Hot Toast
-- **데이터베이스**: Local JSON (Documents/PrimeRing)
-- **AI**: WebLLM (Llama-3.2-3B-Instruct)
+
+- **데이터베이스**: 로컬 파일 시스템 (JSON)
+- **AI**: WebLLM (@mlc-ai/web-llm) - Llama-3.2-3B-Instruct (WebGPU 기반 로컬 실행)
 - **데스크톱**: Electron
 - **스타일링**: CSS Modules
 
@@ -43,6 +46,7 @@ AI 기반 감정 분석을 지원하는 스마트 캘린더 & 다이어리 데�
 - **Node.js** (v18 이상 권장)
 - **npm** 또는 **yarn**
 - **Git**
+- **WebGPU 지원 브라우저/환경** (AI 기능 사용 시 필요)
 
 ### 설치 방법
 
@@ -88,19 +92,20 @@ npm run dev:vite
 ```
 
 브라우저에서 `http://localhost:5173`에 접속합니다.
+(주의: 웹 모드에서는 로컬 파일 시스템 접근 권한이 없어 데이터 저장이 동작하지 않을 수 있습니다. Electron 모드 사용을 권장합니다.)
 
 ## 📁 프로젝트 구조
 
 ```
 prime-ring/
 ├── electron/              # Electron 메인 프로세스
-│   ├── main.ts           # Electron 진입점
+│   ├── main.ts           # Electron 진입점 (IPC 핸들러 포함)
 │   └── preload.ts        # Preload 스크립트
 │
 ├── src/
 │   ├── components/       # React 컴포넌트
 │   │   ├── calendar/    # 캘린더 관련 컴포넌트
-│   │   ├── diary/       # 다이어리 관련 컴포넌트
+│   │   ├── diary/       # 다이어리 관련 컴포넌트 (AI 분석 포함)
 │   │   ├── common/      # 공통 컴포넌트
 │   │   ├── layout/      # 레이아웃 컴포넌트
 │   │   ├── list/        # 리스트 뷰
@@ -113,9 +118,9 @@ prime-ring/
 │   │   └── useTheme.ts
 │   │
 │   ├── services/        # 비즈니스 로직 서비스
-│   │   ├── aiService.ts      # WebLLM 기반 AI 분석
-│   │   ├── diaryService.ts   # 다이어리 CRUD (로컬 저장)
-│   │   └── eventService.ts   # 이벤트 CRUD (로컬 저장)
+│   │   ├── aiService.ts      # WebLLM 기반 로컬 AI 서비스
+│   │   ├── diaryService.ts   # 다이어리 CRUD (JSON 파일)
+│   │   └── eventService.ts   # 이벤트 CRUD (JSON 파일)
 │   │
 │   ├── stores/          # Zustand 상태 관리
 │   │   ├── appStore.ts
@@ -127,7 +132,6 @@ prime-ring/
 │   │
 │   ├── types/           # TypeScript 타입 정의
 │   ├── lib/             # 라이브러리 및 유틸리티
-│   │   ├── firebase/    # Firebase 설정
 │   │   └── utils.ts     # 유틸리티 함수
 │   │
 │   ├── constants/       # 전역 상수
@@ -164,7 +168,17 @@ npm run lint
 
 ## 🐛 문제 해결
 
-### 1. Electron 앱이 실행되지 않음
+
+### 1. AI 모델 로딩 실패
+
+**증상**: AI 기능 사용 시 모델 로딩이 멈추거나 오류 발생
+
+**해결 방법**:
+- WebGPU를 지원하는 환경인지 확인하세요.
+- 최초 실행 시 모델 다운로드(약 2~3GB)가 필요하므로 인터넷 연결 상태를 확인하세요.
+- 충분한 VRAM이 확보되었는지 확인하세요.
+
+### 2. Electron 앱이 실행되지 않음
 
 **증상**: Vite는 실행되지만 Electron 창이 열리지 않음
 
@@ -177,13 +191,13 @@ npm run dev
 ```
 
 ### 2. 포트 충돌 오류
+### 3. 데이터 저장 안됨
 
-**증상**: `Port 5173 is already in use`
+**증상**: 앱 재실행 후 데이터가 사라짐
 
 **해결 방법**:
-- 다른 개발 서버가 실행 중인지 확인
-- 해당 포트를 사용하는 프로세스 종료
-- 또는 `vite.config.ts`에서 포트 변경
+- `npm run dev:vite` (웹 모드)가 아닌 `npm run dev` (Electron 모드)로 실행했는지 확인하세요.
+- 데이터는 사용자 문서 폴더의 `PrimeRing` 디렉토리에 저장됩니다. 해당 폴더 권한을 확인하세요.
 
 ### 3. TypeScript 컴파일 오류
 
