@@ -1,4 +1,5 @@
 import { CreateMLCEngine, MLCEngine, type InitProgressCallback } from "@mlc-ai/web-llm";
+import { constructDiaryAnalysisPrompt } from "./aiPrompt";
 
 // Using Llama-3.2-3B-Instruct - extremely efficient and capable for local usage
 const SELECTED_MODEL = "Llama-3.2-3B-Instruct-q4f16_1-MLC";
@@ -27,24 +28,7 @@ class AiService {
     async analyzeDiary(content: string, date: Date, onProgress: InitProgressCallback): Promise<AIAnalysisResult> {
         const engine = await this.initialize(onProgress);
 
-        const prompt = `
-You are a helpful personal assistant. Analyze the user's diary entry for ${date.toLocaleDateString()}.
-Diary Content:
-"${content}"
-
-Please provide a structured response in the following JSON format ONLY (no other text):
-{
-    "summary": "A concise 1-2 sentence summary of the day.",
-    "flow": ["Step 1: What happened first", "Step 2: What happened next", "Step 3: Conclusion..."],
-    "tips": "One helpful piece of advice or encouraging comment based on the diary."
-}
-Reply ONLY with the JSON.
-`;
-
-        const messages = [
-            { role: "system", content: "You are a helpful AI assistant that outputs strictly valid JSON." },
-            { role: "user", content: prompt }
-        ];
+        const messages = constructDiaryAnalysisPrompt(content, date);
 
         const output = await engine.chat.completions.create({
             messages: messages as any,
