@@ -79,7 +79,7 @@ function ensureSafePath(filename: string): string {
     const relativePath = path.relative(resolvedDataDir, resolvedFilePath)
 
     const isOutside = relativePath.startsWith('..') && (relativePath.length === 2 || relativePath[2] === path.sep)
-    if (isOutside || path.isAbsolute(relativePath)) {
+    if (isOutside || path.isAbsolute(relativePath) || isOutside) {
         throw new Error('Access denied: Invalid file path')
     }
     return resolvedFilePath
