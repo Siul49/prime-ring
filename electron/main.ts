@@ -76,7 +76,7 @@ app.on('window-all-closed', () => {
 ipcMain.handle('save-file', async (event, filename: string, content: string) => {
     try {
         const filePath = path.join(DATA_DIR, filename)
-        fs.writeFileSync(filePath, content, 'utf-8')
+        await fs.promises.writeFile(filePath, content, 'utf-8')
         return { success: true }
     } catch (error: any) {
         console.error('File save error:', error)
