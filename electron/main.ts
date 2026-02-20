@@ -73,9 +73,21 @@ app.on('window-all-closed', () => {
 })
 
 // IPC Handlers
+function ensureSafePath(filename: string): string {
+    const resolvedDataDir = path.resolve(DATA_DIR)
+    const resolvedFilePath = path.resolve(path.join(DATA_DIR, filename))
+    const relativePath = path.relative(resolvedDataDir, resolvedFilePath)
+
+    const isOutside = relativePath.startsWith('..') && (relativePath.length === 2 || relativePath[2] === path.sep)
+    if (isOutside || path.isAbsolute(relativePath) || isOutside) {
+        throw new Error('Access denied: Invalid file path')
+    }
+    return resolvedFilePath
+}
+
 ipcMain.handle('save-file', async (event, filename: string, content: string) => {
     try {
-        const filePath = path.join(DATA_DIR, filename)
+        const filePath = ensureSafePath(filename)
         fs.writeFileSync(filePath, content, 'utf-8')
         return { success: true }
     } catch (error: any) {
@@ -86,16 +98,12 @@ ipcMain.handle('save-file', async (event, filename: string, content: string) => 
 
 ipcMain.handle('load-file', async (event, filename: string) => {
     try {
-        const filePath = path.join(DATA_DIR, filename)
-        try {
-            const data = await fs.promises.readFile(filePath, 'utf-8')
-            return { success: true, data }
-        } catch (error: any) {
-            if (error.code === 'ENOENT') {
-                return { success: true, data: null } // 파일 없으면 null 반환
-            }
-            throw error
+        const filePath = ensureSafePath(filename)
+        if (!fs.existsSync(filePath)) {
+            return { success: true, data: null } // 파일 없으면 null 반환
         }
+        const data = fs.readFileSync(filePath, 'utf-8')
+        return { success: true, data }
     } catch (error: any) {
         console.error('File load error:', error)
         return { success: false, error: error.message }
