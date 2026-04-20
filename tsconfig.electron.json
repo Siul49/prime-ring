@@ -10,5 +10,8 @@
     },
     "include": [
         "electron/**/*"
+    ],
+    "exclude": [
+        "electron/**/*.test.ts"
     ]
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Header } from './components/layout/Header'
 import { Sidebar } from './components/sidebar/Sidebar'
 import { CalendarView } from './components/calendar/CalendarView'
@@ -14,12 +14,18 @@ import './App.css'
 import { Toaster } from 'react-hot-toast'
 import { useModalStore } from './stores/modalStore'
 import { useEventStore } from './stores/eventStore'
+import { useCategoryStore } from './stores/categoryStore'
 
 function App() {
   const { currentView, setCurrentView } = useAppStore()
   const { loading } = useEvents() // 데이터 구독 로직 캡슐화
+  const loadCategories = useCategoryStore((s) => s.loadCategories)
   const { isOpen, selectedDate, openModal, closeModal } = useModalStore()
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>()
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
 
   const handleOpenNewEvent = () => {
     useEventStore.getState().setSelectedEvent(null)

@@ -1,78 +1,122 @@
 import type { Event } from '../types'
+import type { EventRowDTO } from '../electron.d'
 
-const FILE_NAME = 'events.json'
+function toDto(e: Event): EventRowDTO {
+    return {
+        id: e.id,
+        title: e.title,
+        description: e.description ?? null,
+        startDate: e.startDate.toISOString(),
+        endDate: e.endDate.toISOString(),
+        allDay: e.allDay,
+        categoryId: e.categoryId ?? null,
+        tags: e.tags ?? [],
+        color: e.color ?? null,
+        priority: e.priority,
+        recurrenceRrule: e.recurrenceRrule ?? null,
+        recurrenceExceptions: e.recurrence?.exceptions
+            ? e.recurrence.exceptions.map((d) => d.toISOString())
+            : null,
+        metadata: e.metadata ?? null,
+        googleEventId: e.googleEventId ?? null,
+        etag: e.etag ?? null,
+        syncState: e.syncState ?? 'local',
+        lastSyncedAt: e.lastSyncedAt ? e.lastSyncedAt.toISOString() : null,
+        createdAt: e.createdAt.toISOString(),
+        updatedAt: e.updatedAt.toISOString(),
+    }
+}
 
-// Date 객체 변환 헬퍼 (JSON에서 불러올 때 문자열을 Date로 변환)
-const parseEventDates = (event: any): Event => ({
-    ...event,
-    startDate: new Date(event.startDate),
-    endDate: new Date(event.endDate),
-    createdAt: new Date(event.createdAt),
-    updatedAt: new Date(event.updatedAt),
-    recurrence: event.recurrence ? {
-        ...event.recurrence,
-        endDate: event.recurrence.endDate ? new Date(event.recurrence.endDate) : undefined,
-        exceptions: event.recurrence.exceptions?.map((d: string) => new Date(d))
-    } : undefined
-})
+function fromDto(r: EventRowDTO): Event {
+    return {
+        id: r.id,
+        title: r.title,
+        description: r.description ?? undefined,
+        startDate: new Date(r.startDate),
+        endDate: new Date(r.endDate),
+        allDay: r.allDay,
+        categoryId: r.categoryId ?? '',
+        tags: r.tags,
+        color: r.color ?? undefined,
+        priority: r.priority,
+        recurrenceRrule: r.recurrenceRrule ?? undefined,
+        recurrence: r.recurrenceExceptions
+            ? {
+                  rule: 'custom',
+                  interval: 1,
+                  exceptions: r.recurrenceExceptions.map((s) => new Date(s)),
+              }
+            : undefined,
+        metadata: (r.metadata as Event['metadata']) ?? undefined,
+        googleEventId: r.googleEventId ?? undefined,
+        etag: r.etag ?? undefined,
+        syncState: r.syncState,
+        lastSyncedAt: r.lastSyncedAt ? new Date(r.lastSyncedAt) : undefined,
+        createdAt: new Date(r.createdAt),
+        updatedAt: new Date(r.updatedAt),
+    }
+}
+
+function ensureElectron() {
+    if (!window.electron) throw new Error('Electron API not available (run via `npm run dev`)')
+}
 
 export const EventService = {
-    // 모든 이벤트 가져오기
     getEvents: async (): Promise<Event[]> => {
         if (!window.electron) {
             console.warn('Electron API not found. Running in browser mode with empty data.')
             return []
         }
-        const { success, data, error } = await window.electron.loadData(FILE_NAME)
-        if (!success) throw new Error(error)
-        if (!data) return []
-
-        try {
-            const parsed = JSON.parse(data)
-            return parsed.map(parseEventDates)
-        } catch (e) {
-            console.error('Failed to parse events:', e)
-            return []
-        }
+        const res = await window.electron.events.list()
+        if (!res.success) throw new Error(res.error)
+        return res.data.map(fromDto)
     },
 
-    // 이벤트 저장 (전체 덮어쓰기 방식)
-    saveEvents: async (events: Event[]) => {
-        if (!window.electron) {
-            console.error('Cannot save events: Electron API missing')
-            return
-        }
-        const { success, error } = await window.electron.saveData(FILE_NAME, JSON.stringify(events, null, 2))
-        if (!success) throw new Error(error)
-    },
-
-    addEvent: async (eventData: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {
-        const events = await EventService.getEvents()
+    addEvent: async (eventData: Omit<Event, 'id' | 'createdAt' | 'updatedAt' | 'syncState'>) => {
+        ensureElectron()
         const now = new Date()
         const newEvent: Event = {
             ...eventData,
             id: crypto.randomUUID(),
+            syncState: 'local',
             createdAt: now,
             updatedAt: now,
         }
-        await EventService.saveEvents([...events, newEvent])
+        const res = await window.electron.events.upsert(toDto(newEvent))
+        if (!res.success) throw new Error(res.error)
         return newEvent
     },
 
     updateEvent: async (id: string, data: Partial<Event>) => {
-        const events = await EventService.getEvents()
-        const newEvents = events.map(event =>
-            event.id === id
-                ? { ...event, ...data, updatedAt: new Date() }
-                : event
-        )
-        await EventService.saveEvents(newEvents)
+        ensureElectron()
+        // Build a partial DTO with only the fields the caller wants to change.
+        // Main process performs read-modify-write atomically inside a transaction.
+        const patch: { id: string } & Partial<EventRowDTO> = { id }
+        if (data.title !== undefined) patch.title = data.title
+        if (data.description !== undefined) patch.description = data.description ?? null
+        if (data.startDate !== undefined) patch.startDate = data.startDate.toISOString()
+        if (data.endDate !== undefined) patch.endDate = data.endDate.toISOString()
+        if (data.allDay !== undefined) patch.allDay = data.allDay
+        if (data.categoryId !== undefined) patch.categoryId = data.categoryId
+        if (data.tags !== undefined) patch.tags = data.tags
+        if (data.color !== undefined) patch.color = data.color ?? null
+        if (data.priority !== undefined) patch.priority = data.priority
+        if (data.recurrenceRrule !== undefined) patch.recurrenceRrule = data.recurrenceRrule ?? null
+        if (data.recurrence?.exceptions !== undefined) {
+            patch.recurrenceExceptions = data.recurrence.exceptions.map((d) => d.toISOString())
+        }
+        if (data.metadata !== undefined) patch.metadata = data.metadata ?? null
+        if (data.googleEventId !== undefined) patch.googleEventId = data.googleEventId ?? null
+        if (data.etag !== undefined) patch.etag = data.etag ?? null
+        if (data.syncState !== undefined) patch.syncState = data.syncState
+        if (data.lastSyncedAt !== undefined) patch.lastSyncedAt = data.lastSyncedAt?.toISOString() ?? null
+        const res = await window.electron.events.patch(patch)
+        if (!res.success) throw new Error(res.error)
     },
 
     deleteEvent: async (id: string) => {
-        const events = await EventService.getEvents()
-        const newEvents = events.filter(event => event.id !== id)
-        await EventService.saveEvents(newEvents)
-    }
+        ensureElectron()
+        const res = await window.electron.events.delete(id)
+        if (!res.success) throw new Error(res.error)
+    },
 }
-

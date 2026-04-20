@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { toast } from 'react-hot-toast'
-import { Timestamp } from 'firebase/firestore'
 import { useEventStore } from '../../stores/eventStore'
 import { useCategoryStore } from '../../stores/categoryStore'
 import { formatDate } from '../../lib/utils'
@@ -19,7 +18,7 @@ export function EventModal({ isOpen, onClose, initialDate }: EventModalProps) {
     const [description, setDescription] = useState(selectedEvent?.description || '')
     const [categoryId, setCategoryId] = useState(selectedEvent?.categoryId || 'work')
     const [startDate, setStartDate] = useState(
-        initialDate || selectedEvent?.startDate.toDate() || new Date()
+        initialDate || selectedEvent?.startDate || new Date()
     )
     const [allDay, setAllDay] = useState<boolean>(selectedEvent?.allDay ?? true)
 
@@ -35,13 +34,12 @@ export function EventModal({ isOpen, onClose, initialDate }: EventModalProps) {
         const eventData = {
             title,
             description,
-            startDate: Timestamp.fromDate(startDate),
-            endDate: Timestamp.fromDate(startDate),
+            startDate,
+            endDate: startDate,
             allDay,
             categoryId,
             tags: [],
             priority: 'medium' as const,
-            userId: 'demo-user',
         }
 
         if (selectedEvent) {

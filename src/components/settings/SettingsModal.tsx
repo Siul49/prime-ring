@@ -4,6 +4,7 @@ import { useCategoryStore } from '../../stores/categoryStore'
 import { useTheme } from '../../hooks/useTheme'
 import { useAppStore } from '../../stores/appStore'
 import type { ColorMode } from '../../types'
+import { SyncSettingsPanel } from './SyncSettingsPanel'
 import './SettingsModal.css'
 
 const THEME_OPTIONS: { mode: ColorMode; name: string; color: string }[] = [
@@ -19,7 +20,7 @@ export function SettingsModal() {
     const { categories, addCategory, deleteCategory } = useCategoryStore()
     const { theme, toggleTheme } = useTheme()
     const { colorMode, setColorMode } = useAppStore()
-    const [activeTab, setActiveTab] = useState<'general' | 'category'>('general')
+    const [activeTab, setActiveTab] = useState<'general' | 'category' | 'sync'>('general')
 
     const [newCatName, setNewCatName] = useState('')
     const [newCatColor, setNewCatColor] = useState('#22C55E')
@@ -33,7 +34,6 @@ export function SettingsModal() {
             name: newCatName,
             color: newCatColor,
             icon: newCatIcon,
-            userId: 'demo',
         })
         setNewCatName('')
         setNewCatIcon('🏷️')
@@ -59,6 +59,12 @@ export function SettingsModal() {
                         onClick={() => setActiveTab('category')}
                     >
                         카테고리 관리
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'sync' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('sync')}
+                    >
+                        동기화
                     </button>
                 </div>
 
@@ -148,6 +154,8 @@ export function SettingsModal() {
                             </ul>
                         </div>
                     )}
+
+                    {activeTab === 'sync' && <SyncSettingsPanel />}
                 </div>
             </div>
         </div>

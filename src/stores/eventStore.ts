@@ -9,7 +9,7 @@ interface EventState {
     selectedEvent: Event | null
     unsubscribe: (() => void) | null
 
-    addEvent: (event: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>
+    addEvent: (event: Omit<Event, 'id' | 'createdAt' | 'updatedAt' | 'syncState'>) => Promise<void>
     updateEvent: (id: string, data: Partial<Event>) => Promise<void>
     deleteEvent: (id: string) => Promise<void>
     setSelectedEvent: (event: Event | null) => void

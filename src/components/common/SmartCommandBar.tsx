@@ -135,7 +135,6 @@ export function SmartCommandBar() {
                 categoryId: preview.categoryId || categories[0]?.id || 'default',
                 tags: [],
                 priority: 'medium',
-                userId: 'demo'
             })
 
             toast.success(

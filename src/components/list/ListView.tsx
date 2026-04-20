@@ -15,15 +15,15 @@ export function ListView() {
     today.setHours(0, 0, 0, 0)
 
     const sortedEvents = [...events].sort((a, b) =>
-        a.startDate.toDate().getTime() - b.startDate.toDate().getTime()
+        a.startDate.getTime() - b.startDate.getTime()
     )
 
     const todayEvents = sortedEvents.filter(e =>
-        isSameDay(e.startDate.toDate(), today)
+        isSameDay(e.startDate, today)
     )
 
     const upcomingEvents = sortedEvents.filter(e =>
-        e.startDate.toDate() > today
+        e.startDate > today
     )
 
     const getCategoryColor = (categoryId: string) => {
@@ -66,7 +66,7 @@ export function ListView() {
                                             )}
                                         </div>
                                         <span className="event-time">
-                                            {event.allDay ? '종일' : event.startDate.toDate().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                            {event.allDay ? '종일' : event.startDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </li>
                                 ))}
@@ -89,7 +89,7 @@ export function ListView() {
                                         <div className="event-info">
                                             <span className="event-title">{event.title}</span>
                                             <span className="event-date">
-                                                {event.startDate.toDate().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
+                                                {event.startDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
                                             </span>
                                         </div>
                                     </li>

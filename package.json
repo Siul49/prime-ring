@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
-    "dev:electron": "cross-env NODE_ENV=development tsc -p tsconfig.electron.json && wait-on tcp:5173 && electron .",
-    "build": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder",
+    "dev:electron": "cross-env NODE_ENV=development tsc -p tsconfig.electron.json && node scripts/copy-migrations.mjs && wait-on tcp:5173 && electron .",
+    "build": "tsc -b && vite build && tsc -p tsconfig.electron.json && node scripts/copy-migrations.mjs && electron-builder",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test src/lib/utils.test.ts",
+    "test": "node --experimental-strip-types --test \"src/lib/utils.test.ts\" \"electron/db/**/*.test.ts\" \"electron/auth/**/*.test.ts\"",
+    "test:db": "node --experimental-strip-types --test \"electron/db/**/*.test.ts\"",
+    "test:auth": "node --experimental-strip-types --test \"electron/auth/**/*.test.ts\"",
+    "rebuild:electron": "electron-builder install-app-deps",
     "preview": "vite preview"
   },
   "main": "dist-electron/main.js",
@@ -23,6 +26,9 @@
       "dist/**/*",
       "dist-electron/**/*"
     ],
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ],
     "win": {
       "target": "nsis"
     }
@@ -32,18 +38,24 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@mlc-ai/web-llm": "^0.2.80",
+    "better-sqlite3": "^12.9.0",
     "chrono-node": "^2.9.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "firebase": "^12.6.0",
+    "dotenv": "^17.4.2",
     "framer-motion": "^12.23.26",
+    "google-auth-library": "^10.6.2",
+    "googleapis": "^171.4.0",
+    "keytar": "^7.9.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "zod": "^4.3.6",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
